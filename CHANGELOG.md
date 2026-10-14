@@ -3,6 +3,13 @@
 Todas as mudanças relevantes deste pacote, no formato [Keep a Changelog](https://keepachangelog.com/pt-BR/1.1.0/),
 com versionamento [SemVer](https://semver.org/lang/pt-BR/).
 
+## [0.1.1] — 2026-10-14
+Integração ao catálogo (grafo, skills.json, herdados) e correção do texto de precedência herdado.
+
+### Alterado
+- Blocos herdados ressincronizados com a `schematize-engineering` v0.27.0 (`tools/sync-herdados.mjs`): orquestração com a regra de imagem (nunca pelo Claude; detecta Codex/Gemini e pergunta ao usuário qual usar, Codex como sugestão) e `schematize overdev delegar` (comando do app) no lugar do falso nome de skill `schematize-overdev`.
+- Bloco "Precedência e herança" passa à variante `dominio`: o texto antigo dizia que os comandos `/docker-*` "cobrem só o piso da linguagem", o que é falso para skill de domínio/ferramenta.
+
 ## [0.1.0] — 2026-10-14
 Skill nova: Docker/OCI de ponta a ponta, porque a casa já exigia "imagem não-root, pinada por digest, sem segredo em layer" em quatro parágrafos espalhados pela `schematize-infra` e com um único gate (`USER` e `ports:`), sem dizer como se escreve o Dockerfile, o que o BuildKit dá de graça, como a tag vira imutável nem o que o compose de dev pode expor.
 
