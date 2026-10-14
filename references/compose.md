@@ -160,6 +160,7 @@ imagem, em vez de `chmod 777`. Em SELinux, `:z`/`:Z` no mount.
 ### `.env` fora do git
 
 - **MUST:** `.env` no `.gitignore` e no `.dockerignore`. O gate reprova `.env` versionado.
+- `.env` ou segredo que já entrou no git: tratar como vazado (revogar e rotacionar) — `schematize-git → references/segredos.md`.
 - Versione **`.env.example`** com chaves e valores **fictícios ou vazios**, e a documentação do que
   cada uma faz. Quem clona copia `cp .env.example .env` e preenche.
 - O compose lê `.env` do diretório do projeto **para interpolação** (`${VAR}` no YAML). Isso não

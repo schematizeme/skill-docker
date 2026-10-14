@@ -3,8 +3,7 @@ name: schematize-docker
 metadata:
   version: 0.1.1
 description: >-
-  Docker/OCI: Dockerfile multi-stage por digest e não-root, BuildKit, compose de dev, buildx, SBOM, cosign, scan,
-  runtime hardening, registry. Use ao tocar Dockerfile, compose.yaml, imagem ou container. Traz gates estáticos e CI.
+  Docker/OCI: Dockerfile multi-stage por digest e não-root, BuildKit, compose de dev, SBOM, cosign, scan. Use ao tocar Dockerfile, compose.yaml ou imagem. Traz gates e CI.
 ---
 <!-- cross-skill: isolamento.md, entrega.md, segredos.md, resiliencia.md, iac.md -> schematize-infra -->
 <!-- cross-skill: efeitos-externos.md, ops.md -> schematize-engineering -->

@@ -3,6 +3,13 @@
 Todas as mudanças relevantes deste pacote, no formato [Keep a Changelog](https://keepachangelog.com/pt-BR/1.1.0/),
 com versionamento [SemVer](https://semver.org/lang/pt-BR/).
 
+## [0.2.0] — 2026-10-14
+Description reduzida para o orçamento de listagem do catálogo; sem mudança de piso.
+
+### Alterado
+- Description encurtada para ≤190 caracteres (catálogo estourou o orçamento de 9000 com 45 skills), mantendo O QUE + gatilho concreto + divisa com as irmãs.
+- Ponteiro: segredo que já entrou no git é tratado como vazado, com o passo a passo na `schematize-git` (`references/segredos.md`).
+
 ## [0.1.1] — 2026-10-14
 Integração ao catálogo (grafo, skills.json, herdados) e correção do texto de precedência herdado.
 
