@@ -3,7 +3,8 @@ name: schematize-docker
 metadata:
   version: 0.1.0
 description: >-
-  Docker/OCI de ponta a ponta: Dockerfile multi-stage por digest e não-root, BuildKit, compose de dev, buildx, SBOM e provenance, cosign, scan, runtime hardening, registry. Use ao tocar Dockerfile, compose.yaml, imagem, container, buildx ou registry. Traz gates estáticos e CI.
+  Docker/OCI: Dockerfile multi-stage por digest e não-root, BuildKit, compose de dev, buildx, SBOM, cosign, scan,
+  runtime hardening, registry. Use ao tocar Dockerfile, compose.yaml, imagem ou container. Traz gates estáticos e CI.
 ---
 <!-- cross-skill: isolamento.md, entrega.md, segredos.md, resiliencia.md, iac.md -> schematize-infra -->
 <!-- cross-skill: efeitos-externos.md, ops.md -> schematize-engineering -->

@@ -7,6 +7,7 @@ com versionamento [SemVer](https://semver.org/lang/pt-BR/).
 Integração ao catálogo (grafo, skills.json, herdados) e correção do texto de precedência herdado.
 
 ### Alterado
+- Description reduzida (≤235 chars) para caber no orçamento de listagem de skills (soma ≤8300); mesmo território, fronteiras com as irmãs preservadas.
 - Blocos herdados ressincronizados com a `schematize-engineering` v0.27.0 (`tools/sync-herdados.mjs`): orquestração com a regra de imagem (nunca pelo Claude; detecta Codex/Gemini e pergunta ao usuário qual usar, Codex como sugestão) e `schematize overdev delegar` (comando do app) no lugar do falso nome de skill `schematize-overdev`.
 - Bloco "Precedência e herança" passa à variante `dominio`: o texto antigo dizia que os comandos `/docker-*` "cobrem só o piso da linguagem", o que é falso para skill de domínio/ferramenta.
 
