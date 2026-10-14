@@ -1,0 +1,179 @@
+# Compose de DEV/hml: app + postgres + redis. Não é manifesto de produção (produção tem orquestrador próprio).
+# Uso:
+#   cp .env.example .env && mkdir -p secrets && umask 077 \
+#     && openssl rand -base64 32 > secrets/db_password.txt && openssl rand -base64 32 > secrets/redis_password.txt
+#   docker compose up -d --build --wait
+#   docker compose exec db psql -U app app          # acesso ao banco: exec, nunca porta publicada
+#   docker compose --profile tools up -d            # adminer em http://127.0.0.1:18080 (só loopback)
+# Imagens por digest verificados em 2026-10-14; renove por Renovate/Dependabot, não à mão.
+
+name: app
+
+services:
+  # Um-tiro: dá a posse dos volumes nomeados ao UID dos serviços (volume novo nasce root), depois sai.
+  # docker-ok: precisa ser root por segundos para o chown; sem healthcheck/user porque é one-shot (restart: no); capability reduzida a CHOWN
+  volume-init:
+    image: busybox:1.37@sha256:bdf57e528e45e4433820e045b29b4597825a1c9e38353532d90a01445013f82e
+    command: ["sh", "-c", "chown -R 70:70 /pg && chown -R 10001:10001 /redis"]
+    restart: "no"
+    read_only: true
+    cap_drop: [ALL]
+    cap_add: [CHOWN]
+    security_opt: [no-new-privileges:true]
+    mem_limit: 32m
+    pids_limit: 32
+    volumes:
+      - pgdata:/pg
+      - redisdata:/redis
+    networks: [backend]
+
+  app:
+    # A imagem vem do Dockerfile da linguagem (assets/dockerfiles); troque o `dockerfile` conforme o projeto.
+    build:
+      context: .
+      dockerfile: Dockerfile
+    user: "10001:10001"
+    init: true
+    restart: unless-stopped
+    env_file:
+      - .env
+    environment:
+      DB_HOST: db
+      DB_PASSWORD_FILE: /run/secrets/db_password
+      REDIS_URL: redis://redis:6379
+      REDIS_PASSWORD_FILE: /run/secrets/redis_password
+    secrets:
+      - db_password
+      - redis_password
+    ports:
+      - "127.0.0.1:8080:8080"
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "/app", "healthcheck"]
+      interval: 15s
+      timeout: 3s
+      retries: 5
+      start_period: 20s
+    read_only: true
+    tmpfs:
+      - /tmp:size=64m,mode=1777
+    cap_drop: [ALL]
+    security_opt: [no-new-privileges:true]
+    mem_limit: 512m
+    pids_limit: 256
+    networks: [frontend, backend]
+
+  db:
+    image: postgres:18-alpine@sha256:77f585114c32fbca283dc835b0596f4e52b51b4c6662d7810b2f4084f60a1873
+    # 70 é o UID do usuário `postgres` da imagem; o initdb exige UID presente em /etc/passwd (10001 não está).
+    user: "70:70"
+    init: true
+    restart: unless-stopped
+    env_file:
+      - .env
+    environment:
+      POSTGRES_PASSWORD_FILE: /run/secrets/db_password
+      PGDATA: /var/lib/postgresql/data/pgdata
+    secrets:
+      - db_password
+    # SEM `ports:`. Acesso: `docker compose exec db psql -U app app` (ou adminer no profile tools).
+    depends_on:
+      volume-init:
+        condition: service_completed_successfully
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
+      interval: 10s
+      timeout: 3s
+      retries: 10
+      start_period: 15s
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    read_only: true
+    tmpfs:
+      - /tmp:size=64m,mode=1777
+      - /run/postgresql:size=8m,mode=1777
+    cap_drop: [ALL]
+    security_opt: [no-new-privileges:true]
+    shm_size: 128m
+    mem_limit: 1g
+    pids_limit: 256
+    stop_grace_period: 30s
+    networks: [backend]
+
+  redis:
+    image: redis:8-alpine@sha256:3811787313eba226a2ef38658c6ccb91cd5e110edc89c37767de373120a0e5a0
+    user: "10001:10001"
+    init: true
+    restart: unless-stopped
+    # Senha lida do secret em runtime (nunca na linha de comando visível em `ps` do host).
+    command: ["sh", "-c", "exec redis-server --appendonly yes --requirepass \"$$(cat /run/secrets/redis_password)\""]
+    secrets:
+      - redis_password
+    depends_on:
+      volume-init:
+        condition: service_completed_successfully
+    healthcheck:
+      test: ["CMD-SHELL", "REDISCLI_AUTH=\"$$(cat /run/secrets/redis_password)\" redis-cli ping | grep -q PONG"]
+      interval: 10s
+      timeout: 3s
+      retries: 10
+      start_period: 5s
+    volumes:
+      - redisdata:/data
+    read_only: true
+    tmpfs:
+      - /tmp:size=16m,mode=1777
+    cap_drop: [ALL]
+    security_opt: [no-new-privileges:true]
+    mem_limit: 256m
+    pids_limit: 128
+    networks: [backend]
+
+  # Ferramenta de inspeção do banco: fora do `up` padrão, só com `--profile tools`; escuta apenas em loopback.
+  adminer:
+    image: adminer:5@sha256:e3a6b4942dd088a29cc8bbce22553429247c5c2b30b07d856ae49012b5c84a5b
+    profiles: [tools]
+    user: "10001:10001"
+    init: true
+    environment:
+      ADMINER_DEFAULT_SERVER: db
+    ports:
+      - "127.0.0.1:18080:8080"
+    depends_on:
+      db:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "php -r 'exit(@file_get_contents(\"http://127.0.0.1:8080/\") === false ? 1 : 0);'"]
+      interval: 15s
+      timeout: 3s
+      retries: 5
+      start_period: 10s
+    read_only: true
+    tmpfs:
+      - /tmp:size=16m,mode=1777
+    cap_drop: [ALL]
+    security_opt: [no-new-privileges:true]
+    mem_limit: 128m
+    pids_limit: 64
+    networks: [frontend, backend]
+
+networks:
+  frontend: {}
+  # Rede interna: sem rota para fora e sem publicação; só os serviços ligados a ela se falam.
+  backend:
+    internal: true
+
+volumes:
+  pgdata: {}
+  redisdata: {}
+
+# Segredos em arquivo (montados em /run/secrets/<nome>), fora do git (./secrets/ no .gitignore).
+secrets:
+  db_password:
+    file: ./secrets/db_password.txt
+  redis_password:
+    file: ./secrets/redis_password.txt

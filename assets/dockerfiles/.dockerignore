@@ -1,0 +1,65 @@
+# .dockerignore de referência: o contexto de build só leva o que a imagem precisa.
+# Segredos e estado local nunca entram no contexto (nem em camada).
+.git
+.gitignore
+.gitattributes
+.github
+.gitlab-ci.yml
+
+# Segredos e ambiente local
+.env
+.env.*
+!.env.example
+**/*.pem
+**/*.key
+**/*.p12
+**/*.pfx
+**/id_rsa*
+**/id_ed25519*
+secrets/
+config/master.key
+
+# Dependências e artefatos de build (a imagem os recria)
+node_modules
+**/node_modules
+target
+**/target
+dist
+build
+out
+obj/
+.venv
+**/__pycache__
+*.pyc
+vendor/bundle
+tmp
+log
+
+# Editor e SO
+.idea
+.vscode
+.DS_Store
+*.swp
+
+# Testes, relatórios e logs
+*.log
+coverage
+.nyc_output
+htmlcov
+.pytest_cache
+.mypy_cache
+.ruff_cache
+
+# Docker e documentação não são conteúdo da imagem
+Dockerfile*
+*.Dockerfile
+Containerfile*
+.dockerignore
+compose*.yaml
+compose*.yml
+docker-compose*.yml
+docs
+*.md
+!README.md
+.schematize
+*_archive
