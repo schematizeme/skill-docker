@@ -1,0 +1,11 @@
+# hadolint (schematize-docker) — OPCIONAL: o gate `scripts/check-dockerfile.sh` roda sem ele.
+# Copie para a raiz do repo. O piso é "error"; o que o gate da casa já cobra por digest/USER/segredo
+# não é duplicado aqui. Toda exceção é nomeada e tem motivo (nunca `ignored: [...]` sem comentário).
+failure-threshold: error
+trustedRegistries:
+  - docker.io
+  - gcr.io
+  - ghcr.io
+  - mcr.microsoft.com
+  - cgr.dev
+ignored: []
