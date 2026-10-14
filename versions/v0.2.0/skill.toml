@@ -1,0 +1,12 @@
+slug = "docker"
+name = "schematize-docker"
+tag = "Ferramenta · Docker/OCI"
+status = "beta"
+order = 41
+current_version = "0.2.0"
+href = "/docker"
+
+[descriptions]
+pt = "Docker/OCI de ponta a ponta: Dockerfile multi-stage por digest e não-root, BuildKit (cache e segredo efêmero), compose de dev com banco fechado, buildx multi-arch, SBOM/provenance, cosign, scan que trava, runtime hardening e tag imutável = sha do git — com gates estáticos que não precisam do daemon."
+en = "Docker/OCI end to end: multi-stage, digest-pinned, non-root Dockerfiles, BuildKit (cache and ephemeral secrets), dev compose with a closed database, multi-arch buildx, SBOM/provenance, cosign, blocking scans, runtime hardening and immutable tags = git sha — with static gates that need no daemon."
+es = "Docker/OCI de punta a punta: Dockerfile multi-stage por digest y no-root, BuildKit (caché y secreto efímero), compose de dev con base de datos cerrada, buildx multi-arch, SBOM/provenance, cosign, scan que bloquea, runtime hardening y tag inmutable = sha de git — con gates estáticos que no necesitan el daemon."
